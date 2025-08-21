@@ -1,0 +1,120 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Logs
+logs/
+*.log
+
+# Data directories
+data/chroma_db/
+data/documents/
+data/feedback/
+data/sample_reports/*.pdf
+data/sample_reports/*.csv
+data/sample_reports/*.xlsx
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+.dockerignore
+
+# Cloud deployment
+.azure/
+.aws/
+
+# Local development
+local_config.py
+dev_settings.py
+
+# Financial documents (sensitive)
+*.pdf
+*.xls
+*.xlsx
+!**/sample_*.pdf
+!**/example_*.pdf
+
+# API keys and secrets
+secrets/
+*.key
+*.pem
+*.p12
+
+# Backup files
+*.bak
+*.backup
+
+# ChromaDB specific
+chroma.sqlite3
+chroma.sqlite3-*
