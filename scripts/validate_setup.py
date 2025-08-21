@@ -154,30 +154,59 @@ def check_configuration_files():
     return True
 
 
-def check_openai_connection():
-    """Test OpenAI API connection."""
-    print("\n6. Testing OpenAI API connection...")
-    
+def check_llm_connection():
+    """Test LLM API connection (OpenAI or Azure OpenAI)."""
+    print("\n6. Testing LLM API connection...")
+
     try:
-        import openai
         from config.settings import settings
-        
-        client = openai.OpenAI(api_key=settings.openai_api_key)
-        
-        # Test with a simple completion
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": "Hello"}],
-            max_tokens=5
-        )
-        
-        print("   ✓ OpenAI API connection successful")
-        print(f"   ✓ Model: {response.model}")
+
+        if settings.llm_provider == "azure":
+            print("   Testing Azure OpenAI connection...")
+
+            from openai import AzureOpenAI
+
+            client = AzureOpenAI(
+                azure_endpoint=settings.azure_openai_endpoint,
+                api_key=settings.azure_openai_key,
+                api_version=settings.azure_openai_api_version
+            )
+
+            # Test with a simple completion
+            response = client.chat.completions.create(
+                model=settings.azure_openai_deployment_name,
+                messages=[{"role": "user", "content": "Hello"}],
+                max_tokens=5
+            )
+
+            print("   ✓ Azure OpenAI API connection successful")
+            print(f"   ✓ Deployment: {settings.azure_openai_deployment_name}")
+
+        else:
+            print("   Testing standard OpenAI connection...")
+
+            import openai
+
+            client = openai.OpenAI(api_key=settings.openai_api_key)
+
+            # Test with a simple completion
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": "Hello"}],
+                max_tokens=5
+            )
+
+            print("   ✓ OpenAI API connection successful")
+            print(f"   ✓ Model: {response.model}")
+
         return True
-        
+
     except Exception as e:
-        print(f"   ✗ OpenAI API connection failed: {e}")
-        print("   Check your API key and internet connection")
+        print(f"   ✗ LLM API connection failed: {e}")
+        if settings.llm_provider == "azure":
+            print("   Check your Azure OpenAI endpoint, API key, and deployment name")
+        else:
+            print("   Check your OpenAI API key and internet connection")
         return False
 
 
@@ -252,7 +281,7 @@ def main():
         check_environment_config,
         check_directory_structure,
         check_configuration_files,
-        check_openai_connection,
+        check_llm_connection,
         check_sample_data,
         run_basic_import_test
     ]

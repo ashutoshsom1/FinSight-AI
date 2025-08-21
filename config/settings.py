@@ -8,10 +8,20 @@ from pydantic import BaseSettings, Field
 class Settings(BaseSettings):
     """Application settings with environment variable support."""
     
+    # LLM Provider Configuration
+    llm_provider: str = Field("openai", env="LLM_PROVIDER")  # "openai" or "azure"
+
     # OpenAI Configuration
-    openai_api_key: str = Field(..., env="OPENAI_API_KEY")
+    openai_api_key: Optional[str] = Field(None, env="OPENAI_API_KEY")
     openai_model: str = Field("gpt-4", env="OPENAI_MODEL")
     openai_embedding_model: str = Field("text-embedding-3-large", env="OPENAI_EMBEDDING_MODEL")
+
+    # Azure OpenAI Configuration
+    azure_openai_endpoint: Optional[str] = Field(None, env="AZURE_OPENAI_ENDPOINT")
+    azure_openai_key: Optional[str] = Field(None, env="AZURE_OPENAI_KEY")
+    azure_openai_api_version: str = Field("2024-10-21", env="AZURE_OPENAI_API_VERSION")
+    azure_openai_deployment_name: str = Field("gpt-35-turbo-16k", env="AZURE_OPENAI_DEPLOYMENT_NAME")
+    azure_openai_embedding_deployment: str = Field("text-embedding-ada-002", env="AZURE_OPENAI_EMBEDDING_DEPLOYMENT")
     
     # Vector Database Configuration
     vector_db_type: str = Field("chroma", env="VECTOR_DB_TYPE")
@@ -75,6 +85,39 @@ class Settings(BaseSettings):
         if isinstance(self.supported_years, str):
             return [int(year.strip()) for year in self.supported_years.split(",")]
         return self.supported_years
+
+    def validate_llm_config(self) -> bool:
+        """Validate LLM configuration based on provider."""
+        if self.llm_provider == "openai":
+            return self.openai_api_key is not None
+        elif self.llm_provider == "azure":
+            return all([
+                self.azure_openai_endpoint,
+                self.azure_openai_key,
+                self.azure_openai_deployment_name
+            ])
+        return False
+
+    def get_llm_config(self) -> Dict[str, Any]:
+        """Get LLM configuration for the selected provider."""
+        if self.llm_provider == "openai":
+            return {
+                "provider": "openai",
+                "api_key": self.openai_api_key,
+                "model": self.openai_model,
+                "embedding_model": self.openai_embedding_model
+            }
+        elif self.llm_provider == "azure":
+            return {
+                "provider": "azure",
+                "endpoint": self.azure_openai_endpoint,
+                "api_key": self.azure_openai_key,
+                "api_version": self.azure_openai_api_version,
+                "deployment_name": self.azure_openai_deployment_name,
+                "embedding_deployment": self.azure_openai_embedding_deployment
+            }
+        else:
+            raise ValueError(f"Unsupported LLM provider: {self.llm_provider}")
 
 
 # Global settings instance

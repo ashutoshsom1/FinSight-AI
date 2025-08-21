@@ -16,9 +16,9 @@ sys.path.append(str(Path(__file__).parent.parent))
 from data.models.document import QueryRequest, QueryResponse, ComparisonRequest, ComparisonResponse
 from data.storage.vector_store import create_vector_store
 from data.storage.blob_store import create_blob_store
-from embeddings.embedding_service import EmbeddingService
+from embeddings.embedding_factory import create_embedding_service
 from retrieval.rag_engine import RAGEngine
-from llm.financial_llm import FinancialLLM
+from llm.llm_factory import create_financial_llm
 from api.services.financial_service import FinancialService
 from api.middleware.logging import setup_logging
 from config.settings import settings
@@ -50,20 +50,14 @@ async def lifespan(app: FastAPI):
             base_path="./data/documents"
         )
         
-        embedding_service = EmbeddingService(
-            api_key=settings.openai_api_key,
-            model=settings.openai_embedding_model
-        )
-        
+        embedding_service = create_embedding_service()
+
         rag_engine = RAGEngine(
             vector_store=vector_store,
             embedding_service=embedding_service
         )
-        
-        financial_llm = FinancialLLM(
-            api_key=settings.openai_api_key,
-            model=settings.openai_model
-        )
+
+        financial_llm = create_financial_llm()
         
         financial_service = FinancialService(
             rag_engine=rag_engine,
